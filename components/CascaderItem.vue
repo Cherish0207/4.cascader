@@ -35,7 +35,7 @@ export default {
   },
   computed: {
     lists() {
-      return this.currentSelect && this.currentSelect.children;
+      return this.value[this.level] && this.value[this.level].children;
     },
   },
   methods: {
@@ -43,6 +43,7 @@ export default {
       this.currentSelect = item;
       const Value = cloneDeep(this.value)
       Value[this.level] = item
+      Value.splice(this.level + 1)
       this.$emit('input', Value)
     },
     input(value) {
