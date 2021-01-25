@@ -1,5 +1,5 @@
 <template>
-  <Cascader :options="options"></Cascader>
+  <Cascader :options="options" v-model="selected"></Cascader>
 </template>
 
 <script>
@@ -10,6 +10,7 @@ export default {
   },
   data() {
     return {
+      selected: [],
       options: [
         {
           label: "肉类",
