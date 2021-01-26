@@ -3,12 +3,13 @@
     <div class="trigger" @click="toggle">
       <slot></slot>
     </div>
-    <CascaderItem :options="$attrs.options" :value="value" @input="input" v-if="isVisible" :level="0"></CascaderItem>
+    <CascaderItem :options="options" :value="value" @input="input" v-if="isVisible" :level="0"></CascaderItem>
   </div>
 </template>
 <script>
 import clickOutside from '../directives/clickOutside'
 import CascaderItem from './CascaderItem'
+import cloneDeep from 'lodash/cloneDeep'
 export default {
   components: {
     CascaderItem
@@ -17,6 +18,13 @@ export default {
     value: {
       type: Array,
       default: () => []
+    },
+    options: {
+      type: Array,
+      default: () => []
+    },
+    lazyLoad: {
+      type: Function
     }
   },
   data() {
@@ -35,7 +43,33 @@ export default {
       this.isVisible = !this.isVisible;
     },
     input(value) {
-      this.$emit('input', value)
+      const lastItem = value[value.length - 1]
+      const id = lastItem.id
+      if(this.lazyLoad) {
+        this.lazyLoad(id, children => this.handle(id, children))
+      }
+    },
+    handle(id, children) {
+      console.log(id, children);
+      const cloneOptions = cloneDeep(this.options)
+      console.log(cloneOptions);
+      let stack = [...cloneOptions]
+      let index = 0
+      let currentItem
+      while(currentItem = stack[index++]) {
+        if(currentItem.id !== id) {
+          if(currentItem.children) {
+            stack.concat(...currentItem.children)
+          }
+        }else {
+          break
+        }
+      }
+      console.log(currentItem);
+      if(currentItem) {
+        currentItem.children = children
+        this.$emit('update:options', cloneOptions)
+      }
     }
   },
 };

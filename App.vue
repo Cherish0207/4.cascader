@@ -1,5 +1,5 @@
 <template>
-  <Cascader :options="options" v-model="selected" @input="input"></Cascader>
+  <Cascader :options.sync="options" v-model="selected" :lazyLoad="lazyLoad"></Cascader>
 </template>
 
 <script>
@@ -21,10 +21,14 @@ export default {
     this.options = await fetchData(0)
   },
   methods: {
-    async input(value) {
-      const currentItem = value[value.length - 1]
-      let children = await fetchData(currentItem.id)
-      this.$set(currentItem, 'children', children)
+    // async input(value) {
+    //   const currentItem = value[value.length - 1]
+    //   let children = await fetchData(currentItem.id)
+    //   this.$set(currentItem, 'children', children)
+    // },
+    async lazyLoad(id, callback) {
+      let children = await fetchData(id)
+      callback(children)
     }
   },
   data() {
