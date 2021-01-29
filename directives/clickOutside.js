@@ -1,14 +1,20 @@
-function listener(el, binding) {
+function listener(el, binding, vNode) {
   return function(e) {
     if(e.target === el || el.contains(e.target)) return
-    binding.value()
+    // binding.value()
+    let method = binding.expression
+    vNode.context[method]()
+    // console.log(vNode.context[method] === binding.value); // true
   }
 }
 export default {
-  inserted(el, binding) {
-    window.addEventListener('click', listener(el, binding))
+  bind(el) {
+    console.log(el.parentNode);
   },
-  unbind(el, binding) {
-    window.removeEventListener('click', listener(el, binding))
+  inserted(el, binding, vNode) {
+    window.addEventListener('click', listener(el, binding, vNode))
+  },
+  unbind(el, binding, vNode) {
+    window.removeEventListener('click', listener(el, binding, vNode))
   }
 }
